@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMO G - Employee ID Card Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--maroon:#7a1820;--deep:#4d0d13;--gold:#c9a84c;--cream:#f8f5f0;--ink:#1c1410;--muted:#786f69;--line:#e0d8d2}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Jost,Arial,sans-serif;background:radial-gradient(circle at 12% 10%,rgba(201,168,76,.18),transparent 28%),radial-gradient(circle at 90% 20%,rgba(122,24,32,.13),transparent 30%),linear-gradient(180deg,var(--cream),#eee3d5);color:var(--ink);min-height:100vh}
+.topbar{background:var(--maroon);border-bottom:4px solid var(--gold);display:flex;justify-content:space-between;align-items:center;padding:14px 26px;color:#fff}.brand-name{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700}.brand-tag{font-size:10px;letter-spacing:2.6px;text-transform:uppercase;color:var(--gold);margin-top:2px}.cr{font-size:11px;color:rgba(255,255,255,.72)}
+.layout{display:grid;grid-template-columns:390px 1fr;min-height:calc(100vh - 61px)}.form-side{background:#fff;border-right:1px solid var(--line);padding:22px 18px 44px;overflow:auto;max-height:calc(100vh - 61px)}.preview-side{padding:28px 18px 50px;overflow:auto;max-height:calc(100vh - 61px);display:flex;flex-direction:column;align-items:center;background:#c8c0b6}
+.sec{margin-bottom:22px}.sec-label{display:flex;align-items:center;gap:9px;margin-bottom:12px;color:var(--maroon);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2.3px}.sec-label:after{content:"";height:1px;background:var(--line);flex:1}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}.field{display:flex;flex-direction:column;gap:4px}.field label{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.8px}.field input,.field select{width:100%;font:13px Jost,sans-serif;border:1px solid var(--line);border-radius:6px;background:var(--cream);padding:8px 10px;color:var(--ink)}.field input:focus,.field select:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px rgba(122,24,32,.09);background:#fff}
+.btn{width:100%;border:0;border-radius:8px;background:var(--maroon);color:#fff;padding:12px 14px;font:700 12px Jost,sans-serif;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;margin-top:8px}.btn:hover{background:var(--deep)}.btn.secondary{background:#fff;color:var(--maroon);border:1.5px solid var(--maroon)}.hint{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(0,0,0,.32);margin-bottom:16px}
+.card-sheet{display:flex;flex-wrap:wrap;gap:24px;justify-content:center;align-items:flex-start}.id-card{width:86mm;height:54mm;background:#fff;border-radius:5mm;overflow:hidden;position:relative;box-shadow:0 12px 38px rgba(0,0,0,.28);isolation:isolate;color:#17110f}.id-card:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(122,24,32,.08),transparent 36%),linear-gradient(315deg,rgba(201,168,76,.15),transparent 42%);z-index:0}.card-watermark{position:absolute;right:-5mm;bottom:-9mm;width:40mm;height:40mm;opacity:.12;filter:grayscale(100%);z-index:1}.corner{position:absolute;width:21mm;height:21mm;z-index:3;pointer-events:none}.corner.tl{top:0;left:0}.corner.tr{top:0;right:0;transform:scaleX(-1)}.corner.bl{bottom:0;left:0;transform:scaleY(-1)}.corner.br{bottom:0;right:0;transform:scale(-1)}
+.front-content{position:relative;z-index:4;height:100%;display:grid;grid-template-rows:13mm 1fr 7mm}.card-head{display:grid;grid-template-columns:15mm 1fr;align-items:center;padding:3mm 6mm 1mm}.card-logo{width:14mm;height:14mm;object-fit:contain}.company h1{font-family:"Cormorant Garamond",serif;font-size:11.5px;color:var(--maroon);line-height:1}.company div{font-size:5.2px;letter-spacing:.55px;text-transform:uppercase;color:#3d332f;margin-top:.6mm}.front-main{display:grid;grid-template-columns:26mm 1fr;gap:4mm;padding:1mm 6mm 2mm;min-height:0}.photo-wrap{width:26mm;height:28mm;border:1.1mm solid #fff;box-shadow:0 0 0 .35mm var(--gold),0 5px 14px rgba(0,0,0,.18);background:#eee;overflow:hidden}.photo-wrap img{width:100%;height:100%;object-fit:cover}.placeholder{height:100%;display:flex;align-items:center;justify-content:center;color:#9b9189;font-size:7px;text-align:center}.person{padding-top:.4mm;min-width:0}.role{display:inline-block;background:var(--maroon);color:#fff;border-radius:3px;padding:.9mm 1.8mm;font-size:5.8px;font-weight:700;letter-spacing:.45px;text-transform:uppercase;margin-bottom:1.8mm}.person h2{font-size:13.5px;line-height:1.05;color:#111;text-transform:uppercase;word-break:break-word}.person .meta{display:grid;grid-template-columns:14mm 1fr;gap:.75mm;margin-top:2mm;font-size:6.1px}.person .meta b{color:var(--maroon)}.front-foot{background:linear-gradient(90deg,var(--maroon),var(--deep));color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 6mm;font-size:6px}.front-foot strong{color:var(--gold);letter-spacing:.8px}
+.back-content{position:relative;z-index:4;height:100%;display:grid;grid-template-rows:15mm 1fr 16mm;padding:3.2mm 5.5mm}.back-title{text-align:center}.back-title img{width:12mm;height:12mm;object-fit:contain}.back-title h2{font-family:"Cormorant Garamond",serif;color:var(--maroon);font-size:11px;line-height:1}.back-info{font-size:6.1px;line-height:1.32;margin-top:1mm;min-height:0}.back-info b{color:var(--maroon)}.rules{border-top:1px solid rgba(201,168,76,.75);border-bottom:1px solid rgba(201,168,76,.75);padding:1.2mm 0;margin:1.2mm 0;color:#382f2b}.qr{width:13mm;height:13mm;background:repeating-linear-gradient(90deg,#111 0 1.2mm,#fff 1.2mm 2.4mm);border:.8mm solid #fff;box-shadow:0 0 0 .25mm var(--maroon);flex:0 0 auto}.back-bottom{display:flex;align-items:end;justify-content:space-between;gap:3mm;min-height:0}.sign{flex:1;text-align:center;font-size:5.8px}.sign-line{border-top:1px solid #333;margin-bottom:.8mm}.contact{font-size:5.6px;line-height:1.25;text-align:right;max-width:28mm}
+@media(max-width:1050px){.layout{grid-template-columns:1fr}.form-side,.preview-side{max-height:none}.topbar{align-items:flex-start;gap:8px;flex-direction:column}}
+@media print{body{background:#fff}.topbar,.form-side,.hint,.btn{display:none!important}.layout{display:block}.preview-side{padding:0;background:#fff;max-height:none}.card-sheet{gap:8mm}.id-card{box-shadow:none;border:1px solid #ddd}}
+</style>
+</head>
+<body>
+<div class="topbar"><div><div class="brand-name">OMO G Trading &amp; Interior Decoration</div><div class="brand-tag">Employee ID Card Generator</div></div><div class="cr">CR No: 235664 | Qatar</div></div>
+<div class="layout">
+  <aside class="form-side">
+    <div class="sec"><div class="sec-label">Employee Details</div><div class="grid2">
+      <div class="field full"><label>Employee Photo / ID Image</label><input id="photoInput" type="file" accept="image/*"></div>
+      <div class="field full"><label>Full Name</label><input id="employeeName" value="JOHN SMITH"></div>
+      <div class="field full"><label>Position</label><select id="position"><option>Supervisor</option><option>Interior Designer</option><option>Customer Service</option><option>Gypsum Technician</option><option>Secretary</option><option>Accountant / Auditor</option><option>Interview Desig</option><option>Representative</option></select></div>
+      <div class="field"><label>Employee ID</label><input id="employeeId" value="OMO-EMP-001"></div>
+      <div class="field"><label>QID / Passport</label><input id="qid" value="A12345678"></div>
+      <div class="field"><label>Blood Group</label><input id="blood" value="O+"></div>
+      <div class="field"><label>Nationality</label><input id="nationality" value="Nigeria"></div>
+      <div class="field"><label>Issue Date</label><input id="issueDate" type="date"></div>
+      <div class="field"><label>Expiry Date</label><input id="expiryDate" type="date"></div>
+      <div class="field full"><label>Emergency Contact</label><input id="emergency" value="+974 7102 1381"></div>
+    </div></div>
+    <button class="btn" id="downloadBtn">Download Front + Back PDF</button>
+    <button class="btn secondary" onclick="window.print()">Print Cards</button>
+  </aside>
+  <main class="preview-side">
+    <div class="hint">ID Card Preview</div>
+    <section class="card-sheet" id="cardSheet">
+      <article class="id-card" id="frontCard">
+        <img class="card-watermark" src="logo.png" alt="">
+        <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+        <div class="front-content">
+          <div class="card-head"><img class="card-logo" src="logo.png" alt=""><div class="company"><h1>OMO G Trading And Interior Decoration</h1><div>Employee Identification Card</div></div></div>
+          <div class="front-main"><div class="photo-wrap"><img id="photo" alt="" style="display:none"><div class="placeholder" id="photoPlaceholder">Upload<br>Photo</div></div><div class="person"><span class="role" id="positionOut"></span><h2 id="nameOut"></h2><div class="meta"><b>ID No.</b><span id="employeeIdOut"></span><b>QID</b><span id="qidOut"></span><b>Blood</b><span id="bloodOut"></span><b>Nation</b><span id="nationalityOut"></span></div></div></div>
+          <div class="front-foot"><span>CR No: 235664</span><strong>AUTHORIZED ID</strong><span>Doha, Qatar</span></div>
+        </div>
+      </article>
+      <article class="id-card" id="backCard">
+        <img class="card-watermark" src="logo.png" alt="">
+        <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+        <div class="back-content">
+          <div class="back-title"><img src="logo.png" alt=""><h2>OMO G Trading And Interior Decoration</h2></div>
+          <div class="back-info">
+            <p><b>This card is company property.</b> If found, please return it to OMO G Trading And Interior Decoration.</p>
+            <div class="rules">The holder is an employee of OMO G. This card must be presented when requested and is valid only during employment.</div>
+            <p><b>Issued:</b> <span id="issueOut"></span> &nbsp; <b>Expires:</b> <span id="expiryOut"></span></p>
+            <p><b>Emergency:</b> <span id="emergencyOut"></span></p>
+          </div>
+          <div class="back-bottom"><div class="qr"></div><div class="sign"><div class="sign-line"></div>Managing Director</div><div class="contact">Office 70, 2nd Floor Block E,<br>Al Mirqab Mall, Doha, Qatar<br>+974 7102 1381<br>info@omoginteriors.com<br>www.omoginteriors.com</div></div>
+        </div>
+      </article>
+    </section>
+  </main>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const today=new Date();const nextYear=new Date(today);nextYear.setFullYear(today.getFullYear()+1);
+$("issueDate").value=today.toISOString().slice(0,10);$("expiryDate").value=nextYear.toISOString().slice(0,10);
+function niceDate(value){if(!value)return "";const d=new Date(value+"T00:00:00");return d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}
+function update(){["employeeName","position","employeeId","qid","blood","nationality","emergency"].forEach(id=>{const out=$(id+"Out");if(out)out.textContent=$(id).value});$("nameOut").textContent=$("employeeName").value;$("issueOut").textContent=niceDate($("issueDate").value);$("expiryOut").textContent=niceDate($("expiryDate").value)}
+document.querySelectorAll("input,select").forEach(el=>el.addEventListener("input",update));
+$("photoInput").addEventListener("change",event=>{const file=event.target.files&&event.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{$("photo").src=reader.result;$("photo").style.display="block";$("photoPlaceholder").style.display="none"};reader.readAsDataURL(file)});
+document.querySelectorAll(".corner").forEach(c=>c.innerHTML=`<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L58,0 L58,7 L7,7 L7,58 L0,58 Z" fill="#7a1820"/><path d="M0,0 L42,0 L42,3.5 L3.5,3.5 L3.5,42 L0,42 Z" fill="#c9a84c"/><circle cx="62" cy="12" r="3" fill="#c9a84c" opacity=".7"/><circle cx="12" cy="62" r="3" fill="#c9a84c" opacity=".7"/></svg>`);
+$("downloadBtn").addEventListener("click",async()=>{update();const {jsPDF}=window.jspdf;const doc=new jsPDF("l","mm","a4");const cards=[$("frontCard"),$("backCard")];for(let i=0;i<cards.length;i++){const canvas=await html2canvas(cards[i],{scale:4,useCORS:true,backgroundColor:"#ffffff"});const img=canvas.toDataURL("image/png");doc.addImage(img,"PNG",i===0?42:170,62,86,54)}const name=($("employeeName").value||"employee").replace(/[^a-z0-9]+/gi,"_").replace(/^_|_$/g,"");doc.save(`OMO_G_ID_Card_${name}.pdf`)});
+update();
+</script>
+</body>
+</html>

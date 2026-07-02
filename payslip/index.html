@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMO G - Payslip Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--maroon:#7a1820;--deep:#4e0f15;--gold:#c9a84c;--cream:#f8f5f0;--paper:#fff;--ink:#1c1410;--muted:#746a65;--line:#e3d9cf;--soft:#fdf0f1}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Jost,Arial,sans-serif;background:radial-gradient(circle at 12% 10%,rgba(201,168,76,.18),transparent 28%),radial-gradient(circle at 92% 24%,rgba(122,24,32,.13),transparent 30%),linear-gradient(180deg,var(--cream),#eee3d5);color:var(--ink);min-height:100vh}
+.topbar{background:var(--maroon);border-bottom:4px solid var(--gold);display:flex;justify-content:space-between;align-items:center;padding:14px 26px;color:#fff}
+.brand-name{font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:700}.brand-tag{font-size:10px;letter-spacing:2.6px;text-transform:uppercase;color:var(--gold);margin-top:2px}.cr{font-size:11px;color:rgba(255,255,255,.72)}
+.layout{display:grid;grid-template-columns:390px 1fr;min-height:calc(100vh - 61px)}
+.form-side{background:#fff;border-right:1px solid var(--line);padding:22px 18px 44px;overflow:auto;max-height:calc(100vh - 61px)}
+.preview-side{padding:28px 18px 50px;overflow:auto;max-height:calc(100vh - 61px);display:flex;flex-direction:column;align-items:center;background:#c8c0b6}
+.sec{margin-bottom:22px}.sec-label{display:flex;align-items:center;gap:9px;margin-bottom:12px;color:var(--maroon);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2.3px}.sec-label:after{content:"";height:1px;background:var(--line);flex:1}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:4px}.field label{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.8px}.field input,.field select,.field textarea{width:100%;font:13px Jost,sans-serif;border:1px solid var(--line);border-radius:6px;background:var(--cream);padding:8px 10px;color:var(--ink)}.field textarea{min-height:58px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 3px rgba(122,24,32,.09);background:#fff}
+.btn{width:100%;border:0;border-radius:8px;background:var(--maroon);color:#fff;padding:12px 14px;font:700 12px Jost,sans-serif;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;margin-top:8px}.btn:hover{background:var(--deep)}.btn.secondary{background:#fff;color:var(--maroon);border:1.5px solid var(--maroon)}
+.summary-pill{background:var(--soft);border:1px solid rgba(122,24,32,.14);border-radius:8px;padding:12px;margin-top:12px;display:flex;justify-content:space-between;align-items:center}.summary-pill span{font-size:11px;color:var(--muted);font-weight:600}.summary-pill strong{font-family:"Cormorant Garamond",serif;color:var(--maroon);font-size:23px}
+.hint{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(0,0,0,.32);margin-bottom:16px}
+.paper{width:210mm;min-height:297mm;background:#fff;box-shadow:0 8px 48px rgba(0,0,0,.25);position:relative;overflow:hidden;isolation:isolate;font-family:Arial,sans-serif;color:#111}
+.corner{position:absolute;width:90px;height:90px;z-index:8;pointer-events:none}.corner-tl{top:0;left:0}.corner-tr{top:0;right:0;transform:scaleX(-1)}.corner-bl{bottom:0;left:0;transform:scaleY(-1)}.corner-br{bottom:0;right:0;transform:scale(-1)}
+.watermark{position:absolute;top:53%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);z-index:1;opacity:.18;text-align:center;pointer-events:none;width:70%}.watermark img{width:320px;height:320px;object-fit:contain;filter:grayscale(100%) contrast(1.12) brightness(.9)}.wm-ar{font:700 30px Arial,sans-serif;color:var(--maroon);direction:rtl;white-space:nowrap}.wm-en{font:700 17px Arial,sans-serif;letter-spacing:3px;color:var(--maroon);white-space:nowrap;margin-top:7px}
+.doc{position:relative;z-index:3;padding:22mm 18mm 15mm;min-height:297mm;display:flex;flex-direction:column}
+.head{display:grid;grid-template-columns:130px 1fr 130px;align-items:center;gap:16px}.logo{width:126px;height:126px;object-fit:contain}.company{text-align:center}.company .ar{font-size:24px;font-weight:700;color:var(--maroon);direction:rtl}.company h1{font-family:"Cormorant Garamond",serif;font-size:25px;color:var(--maroon);line-height:1.05;margin-top:4px}.company p{font-size:10.5px;line-height:1.5;color:#4b403b;margin-top:7px}.doc-title{text-align:right}.doc-title h2{font-size:25px;color:var(--maroon);letter-spacing:1.5px}.doc-title div{font-size:11px;margin-top:5px;color:#4a423e}
+.strip{height:6px;background:repeating-linear-gradient(90deg,var(--maroon) 0 13px,var(--gold) 13px 26px);margin:14px -18mm 18px}.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 20px;border:1px solid #d8d0ca;background:rgba(253,248,245,.72);padding:12px;margin-bottom:14px}.meta{display:grid;grid-template-columns:120px 1fr;font-size:12px;line-height:1.55}.meta b{color:var(--maroon)}
+.section-title{font-size:12px;font-weight:700;letter-spacing:1.7px;text-transform:uppercase;color:var(--maroon);border-bottom:1px solid var(--gold);padding-bottom:5px;margin:10px 0 8px}
+table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:12px}th{background:var(--maroon);color:#fff;text-align:left;padding:8px 9px;font-size:11px;letter-spacing:.7px;text-transform:uppercase}td{border:1px solid #d4ccc5;padding:7px 9px}td.amount{text-align:right;font-weight:700}.deduct th{background:#4f3931}.total-row td{background:#fbf4e5;font-weight:700;color:#111}.net{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(135deg,var(--maroon),var(--deep));color:#fff;padding:13px 16px;margin-top:8px}.net span{font-size:12px;text-transform:uppercase;letter-spacing:1.6px}.net strong{font-size:22px}
+.words{border:1px solid #d8d0ca;background:#fff;padding:10px 12px;font-size:12px;margin-top:10px}.notes{font-size:11px;line-height:1.7;color:#3f3936;margin-top:12px}.sign-row{display:grid;grid-template-columns:1fr 1fr;gap:70px;margin-top:auto;padding-top:36px;font-size:12px}.sign-line{border-top:1px solid #555;padding-top:5px}.footer{margin-top:18px;border-top:1px solid var(--gold);padding-top:8px;font-size:10px;text-align:center;color:#514742}
+@media(max-width:1050px){.layout{grid-template-columns:1fr}.form-side,.preview-side{max-height:none}.paper{transform:scale(.72);transform-origin:top center;margin-bottom:-82mm}.topbar{align-items:flex-start;gap:8px;flex-direction:column}}
+@media print{body{background:#fff}.topbar,.form-side,.hint,.btn{display:none!important}.layout{display:block}.preview-side{padding:0;background:#fff;max-height:none}.paper{box-shadow:none;margin:0;transform:none}}
+</style>
+</head>
+<body>
+<div class="topbar"><div><div class="brand-name">OMO G Trading &amp; Interior Decoration</div><div class="brand-tag">Monthly Payslip Generator</div></div><div class="cr">CR No: 235664 | Qatar</div></div>
+<div class="layout">
+  <aside class="form-side">
+    <div class="sec"><div class="sec-label">Employee Details</div><div class="grid2">
+      <div class="field full"><label>Employee Name</label><input id="employeeName" value="JOHN SMITH"></div>
+      <div class="field"><label>Employee ID</label><input id="employeeId" value="OMO-EMP-001"></div>
+      <div class="field"><label>QID / Passport</label><input id="qid" value="A12345678"></div>
+      <div class="field full"><label>Position</label><select id="position"><option>Supervisor</option><option>Interior Designer</option><option>Customer Service</option><option>Gypsum Technician</option><option>Secretary</option><option>Accountant / Auditor</option><option>Interview Desig</option><option>Representative</option></select></div>
+      <div class="field"><label>Department</label><input id="department" value="Interior Decoration"></div>
+      <div class="field"><label>Bank / Payment Mode</label><input id="bank" value="Cash / Bank Transfer"></div>
+    </div></div>
+    <div class="sec"><div class="sec-label">Payslip Period</div><div class="grid2">
+      <div class="field"><label>Pay Month</label><input id="payMonth" type="month"></div>
+      <div class="field"><label>Issue Date</label><input id="issueDate" type="date"></div>
+      <div class="field"><label>Working Days</label><input id="workingDays" type="number" value="26"></div>
+      <div class="field"><label>Paid Days</label><input id="paidDays" type="number" value="26"></div>
+    </div></div>
+    <div class="sec"><div class="sec-label">Earnings (QAR)</div><div class="grid3">
+      <div class="field"><label>Basic</label><input id="basic" type="number" value="1600"></div>
+      <div class="field"><label>Accommodation</label><input id="accommodation" type="number" value="0"></div>
+      <div class="field"><label>Food</label><input id="food" type="number" value="0"></div>
+      <div class="field"><label>Transport</label><input id="transport" type="number" value="0"></div>
+      <div class="field"><label>Overtime</label><input id="overtime" type="number" value="0"></div>
+      <div class="field"><label>Bonus</label><input id="bonus" type="number" value="0"></div>
+    </div></div>
+    <div class="sec"><div class="sec-label">Deductions (QAR)</div><div class="grid3">
+      <div class="field"><label>Advance</label><input id="advance" type="number" value="0"></div>
+      <div class="field"><label>Absence</label><input id="absence" type="number" value="0"></div>
+      <div class="field"><label>Other</label><input id="otherDeduction" type="number" value="0"></div>
+      <div class="field full"><label>Notes</label><textarea id="notes">This is a computer generated payslip for the selected salary month.</textarea></div>
+    </div><div class="summary-pill"><span>Net Salary</span><strong id="netPreview">QAR 0.00</strong></div></div>
+    <button class="btn" id="downloadBtn">Download Monthly PDF</button>
+    <button class="btn secondary" onclick="window.print()">Print / Save as PDF</button>
+  </aside>
+  <main class="preview-side">
+    <div class="hint">Payslip Preview</div>
+    <section class="paper" id="payslip">
+      <div class="corner corner-tl"></div><div class="corner corner-tr"></div><div class="corner corner-bl"></div><div class="corner corner-br"></div>
+      <div class="watermark"><img src="logo.png" alt=""><div class="wm-ar">اومو جي للتجارة والديكور الداخلي</div><div class="wm-en">OMO G TRADING AND INTERIOR DECORATION</div></div>
+      <div class="doc">
+        <header class="head"><img class="logo" src="logo.png" alt="OMO G Logo"><div class="company"><div class="ar">اومو جي للتجارة والديكور الداخلي</div><h1>OMO G Trading And Interior Decoration</h1><p>Office 70, 2nd Floor Block E, Al Mirqab Mall, Doha, Qatar<br>CR No: 235664 | Tel: +974 7102 1381 | info@omoginteriors.com</p></div><div class="doc-title"><h2>PAYSLIP</h2><div id="slipNo">No: OMO-PS-0001</div></div></header>
+        <div class="strip"></div>
+        <div class="meta-grid">
+          <div class="meta"><b>Employee Name</b><span data-out="employeeName"></span></div><div class="meta"><b>Pay Month</b><span id="monthOut"></span></div>
+          <div class="meta"><b>Employee ID</b><span data-out="employeeId"></span></div><div class="meta"><b>Issue Date</b><span id="issueOut"></span></div>
+          <div class="meta"><b>Position</b><span data-out="position"></span></div><div class="meta"><b>QID / Passport</b><span data-out="qid"></span></div>
+          <div class="meta"><b>Department</b><span data-out="department"></span></div><div class="meta"><b>Payment Mode</b><span data-out="bank"></span></div>
+          <div class="meta"><b>Working Days</b><span data-out="workingDays"></span></div><div class="meta"><b>Paid Days</b><span data-out="paidDays"></span></div>
+        </div>
+        <div class="section-title">Earnings</div>
+        <table><thead><tr><th>Description</th><th class="amount">Amount (QAR)</th></tr></thead><tbody id="earningsBody"></tbody></table>
+        <div class="section-title">Deductions</div>
+        <table class="deduct"><thead><tr><th>Description</th><th class="amount">Amount (QAR)</th></tr></thead><tbody id="deductionsBody"></tbody></table>
+        <div class="net"><span>Net Payable Salary</span><strong id="netOut">QAR 0.00</strong></div>
+        <div class="words"><b>Amount in words:</b> <span id="wordsOut"></span></div>
+        <p class="notes" id="notesOut"></p>
+        <div class="sign-row"><div><div class="sign-line">Prepared / Authorized by OMO G</div></div><div><div class="sign-line">Employee Acknowledgement</div></div></div>
+        <div class="footer">OMO G Trading And Interior Decoration | Office 70, 2nd Floor Block E, Al Mirqab Mall, Doha, Qatar | www.omoginteriors.com</div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>`QAR ${(Number(n)||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+const today=new Date();
+$("issueDate").value=today.toISOString().slice(0,10);
+$("payMonth").value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`;
+const presets={Supervisor:{basic:1800,accommodation:0,food:0,transport:0},"Interior Designer":{basic:2200,accommodation:0,food:0,transport:0},"Customer Service":{basic:1600,accommodation:0,food:0,transport:0},"Gypsum Technician":{basic:1700,accommodation:0,food:0,transport:0},Secretary:{basic:1600,accommodation:0,food:0,transport:0},"Accountant / Auditor":{basic:2200,accommodation:0,food:0,transport:0},"Interview Desig":{basic:1600,accommodation:0,food:0,transport:0},Representative:{basic:1600,accommodation:0,food:0,transport:0}};
+function niceDate(value){if(!value)return "";const d=new Date(value+"T00:00:00");return d.toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"})}
+function niceMonth(value){if(!value)return "";const [y,m]=value.split("-");return new Date(y,Number(m)-1,1).toLocaleDateString("en-GB",{month:"long",year:"numeric"})}
+function amountWords(n){n=Math.round(Number(n)||0);const small=["zero","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"];const tens=["","","twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"];function under1000(x){let out=[];if(x>=100){out.push(small[Math.floor(x/100)]+" hundred");x%=100}if(x>=20){out.push(tens[Math.floor(x/10)]);x%=10}if(x>0)out.push(small[x]);return out.join(" ")}if(n===0)return "Zero Qatari Riyals only";let parts=[];if(n>=1000000){parts.push(under1000(Math.floor(n/1000000))+" million");n%=1000000}if(n>=1000){parts.push(under1000(Math.floor(n/1000))+" thousand");n%=1000}if(n>0)parts.push(under1000(n));return parts.join(" ").replace(/\b\w/g,c=>c.toUpperCase())+" Qatari Riyals only"}
+function row(label,value){return `<tr><td>${label}</td><td class="amount">${money(value)}</td></tr>`}
+function update(){document.querySelectorAll("[data-out]").forEach(el=>{const id=el.dataset.out;el.textContent=$(id).value||""});const gross=["basic","accommodation","food","transport","overtime","bonus"].reduce((s,id)=>s+(Number($(id).value)||0),0);const deductions=["advance","absence","otherDeduction"].reduce((s,id)=>s+(Number($(id).value)||0),0);const net=gross-deductions;$("earningsBody").innerHTML=row("Basic Salary",$("basic").value)+row("Accommodation Allowance",$("accommodation").value)+row("Food Allowance",$("food").value)+row("Transport Allowance",$("transport").value)+row("Overtime",$("overtime").value)+row("Bonus / Other Earnings",$("bonus").value)+`<tr class="total-row"><td>Gross Earnings</td><td class="amount">${money(gross)}</td></tr>`;$("deductionsBody").innerHTML=row("Salary Advance",$("advance").value)+row("Absence / Leave Deduction",$("absence").value)+row("Other Deduction",$("otherDeduction").value)+`<tr class="total-row"><td>Total Deductions</td><td class="amount">${money(deductions)}</td></tr>`;$("netOut").textContent=money(net);$("netPreview").textContent=money(net);$("wordsOut").textContent=amountWords(net);$("notesOut").textContent=$("notes").value;$("monthOut").textContent=niceMonth($("payMonth").value);$("issueOut").textContent=niceDate($("issueDate").value);const stamp=($("payMonth").value||"0000-00").replace("-","");$("slipNo").textContent=`No: OMO-PS-${stamp}-${($("employeeId").value||"EMP").replace(/[^A-Z0-9]/gi,"").toUpperCase()}`}
+document.querySelectorAll("input,select,textarea").forEach(el=>el.addEventListener("input",update));
+$("position").addEventListener("change",()=>{const p=presets[$("position").value];if(p){Object.entries(p).forEach(([id,v])=>$(id).value=v)}update()});
+$("downloadBtn").addEventListener("click",async()=>{update();const {jsPDF}=window.jspdf;const paper=$("payslip");const canvas=await html2canvas(paper,{scale:2,useCORS:true,backgroundColor:"#ffffff"});const img=canvas.toDataURL("image/png");const doc=new jsPDF("p","mm","a4");doc.addImage(img,"PNG",0,0,210,297);const month=($("payMonth").value||"month").replace("-","_");const name=($("employeeName").value||"employee").replace(/[^a-z0-9]+/gi,"_").replace(/^_|_$/g,"");doc.save(`OMO_G_Payslip_${month}_${name}.pdf`)});
+document.querySelectorAll(".corner").forEach(c=>c.innerHTML=`<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 L58,0 L58,7 L7,7 L7,58 L0,58 Z" fill="#7a1820"/><path d="M0,0 L42,0 L42,3.5 L3.5,3.5 L3.5,42 L0,42 Z" fill="#c9a84c"/><circle cx="62" cy="12" r="3" fill="#c9a84c" opacity=".7"/><circle cx="12" cy="62" r="3" fill="#c9a84c" opacity=".7"/><line x1="0" y1="12" x2="50" y2="12" stroke="#c9a84c" stroke-width=".8" opacity=".35"/><line x1="12" y1="0" x2="12" y2="50" stroke="#c9a84c" stroke-width=".8" opacity=".35"/></svg>`);
+update();
+</script>
+</body>
+</html>

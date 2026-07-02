@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMO G Employee Tools</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--maroon:#7a1820;--deep:#4e0f15;--gold:#c9a84c;--cream:#f8f5f0;--ink:#1c1410;--muted:#706660}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;font-family:Jost,Arial,sans-serif;color:var(--ink);background:radial-gradient(circle at 14% 14%,rgba(201,168,76,.22),transparent 30%),radial-gradient(circle at 86% 20%,rgba(122,24,32,.16),transparent 30%),linear-gradient(180deg,var(--cream),#eee3d5);display:grid;place-items:center;padding:28px}
+.wrap{width:min(920px,100%);background:#fff;border:1px solid rgba(122,24,32,.13);border-radius:8px;box-shadow:0 20px 60px rgba(35,20,14,.16);overflow:hidden}
+.top{background:var(--maroon);border-bottom:5px solid var(--gold);padding:28px 32px;color:#fff;display:flex;gap:22px;align-items:center}
+.top img{width:86px;height:86px;object-fit:contain;background:#fff;border-radius:50%;padding:6px}
+h1{font-family:"Cormorant Garamond",serif;font-size:34px;line-height:1;color:#fff}
+.tag{margin-top:7px;font-size:11px;letter-spacing:2.6px;text-transform:uppercase;color:var(--gold);font-weight:700}
+.content{padding:32px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.card{border:1px solid #e3d9cf;border-radius:8px;padding:24px;background:#fdfaf6}
+.card h2{font-family:"Cormorant Garamond",serif;color:var(--maroon);font-size:28px;margin-bottom:8px}
+.card p{font-size:14px;line-height:1.6;color:var(--muted);min-height:68px}
+a{display:inline-flex;align-items:center;justify-content:center;margin-top:18px;background:var(--maroon);color:#fff;text-decoration:none;border-radius:7px;padding:12px 18px;font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+a:hover{background:var(--deep)}
+.foot{border-top:1px solid #e3d9cf;padding:16px 32px;color:var(--muted);font-size:12px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+@media(max-width:720px){.top{align-items:flex-start;flex-direction:column}.content{grid-template-columns:1fr}h1{font-size:29px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <img src="payslip/logo.png" alt="OMO G Logo">
+    <div>
+      <h1>OMO G Employee Tools</h1>
+      <div class="tag">Payslip & ID Card Generators</div>
+    </div>
+  </header>
+  <section class="content">
+    <article class="card">
+      <h2>Payslip Generator</h2>
+      <p>Create monthly employee payslips with editable salary, allowances, deductions, OMO G watermark, and PDF export.</p>
+      <a href="payslip/">Open Payslip</a>
+    </article>
+    <article class="card">
+      <h2>ID Card Generator</h2>
+      <p>Create front and back employee ID cards with photo upload, position details, validity dates, and PDF export.</p>
+      <a href="id-card/">Open ID Card</a>
+    </article>
+  </section>
+  <footer class="foot">
+    <span>OMO G Trading And Interior Decoration</span>
+    <span>CR No: 235664 | Doha, Qatar</span>
+  </footer>
+</main>
+</body>
+</html>
